@@ -1,0 +1,35 @@
+{
+  "name": "trying-oauth-in-action-code-ch-3-ex-1",
+  "version": "1.0.0",
+  "description": "🪩🪩🪩 `oauth-in-action-code`のChapter3のExercise1を試してみる！",
+  "main": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osawa-koki/trying-oauth-in-action-code-ch-3-ex-1.git"
+  },
+  "author": "osawa-koki <koki@osawa.cloud>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/osawa-koki/trying-oauth-in-action-code-ch-3-ex-1/issues"
+  },
+  "homepage": "https://github.com/osawa-koki/trying-oauth-in-action-code-ch-3-ex-1#readme",
+  "scripts": {
+    "build": "esbuild ./src/index.ts --bundle --outfile=./dist/index.js --minify --sourcemap --platform=node --target=es2020",
+    "start": "node ./dist/index.js",
+    "dev": "node -r esbuild-register ./src/index.ts",
+    "lint": "eslint ./src/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "dependencies": {
+    "esbuild": "^0.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "esbuild-register": "^3.6.0",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  }
+}
