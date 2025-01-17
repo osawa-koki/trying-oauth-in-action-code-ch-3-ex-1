@@ -1,6 +1,6 @@
 # trying-oauth-in-action-code-ch-3-ex-1
 
-🪩🪩🪩 `oauth-in-action-code(https://github.com/osawa-koki/oauth-in-action-code.git)`のChapter3のExercise1を試してみる！  
+🪩🪩🪩 [oauth-in-action-code](https://github.com/osawa-koki/oauth-in-action-code)のChapter3のExercise1を試してみる！  
 
 ## 開発環境の構築
 
