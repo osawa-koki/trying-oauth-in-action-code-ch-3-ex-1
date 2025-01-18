@@ -28,8 +28,8 @@ const authServer = {
  * Add the client information in here
  */
 const client = {
-  "client_id": "",
-  "client_secret": "",
+  "client_id": "oauth-client-1",
+  "client_secret": "oauth-client-secret-1",
   "redirect_uris": ["http://localhost:9000/callback"]
 };
 
@@ -48,18 +48,67 @@ app.get('/authorize', function(req: Request, res: Response){
   /*
    * Send the user to the authorization server
    */
+  state = randomstring.generate(10);
+  const authorizeUrl = buildUrl(authServer.authorizationEndpoint, {
+    response_type: 'code',
+    client_id: client.client_id,
+    redirect_uri: client.redirect_uris[0],
+    state: state,
+  });
+  res.redirect(authorizeUrl);
 });
 
 app.get('/callback', function(req: Request, res: Response){
   /*
    * Parse the response from the authorization server and get a token
    */
+  const _state = req.query.state as string;
+  if (_state !== state) {
+    res.render('error', {error: 'State value does not match'});
+    return;
+  }
+  const code = req.query.code as string;
+  const formData = qs.stringify({
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: client.redirect_uris[0],
+  });
+  const headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Authorization': `Basic ${encodeClientCredentials(client.client_id, client.client_secret)}`,
+  };
+  const tokenResponse = request('POST', authServer.tokenEndpoint, {
+    headers,
+    body: formData,
+  });
+  const responseBody = JSON.parse(tokenResponse.getBody('utf-8') as string);
+  const _accessToken = responseBody.access_token;
+  const _scope = responseBody.scope;
+  res.render('index', {access_token: _accessToken, scope: scope});
+  access_token = _accessToken;
+  scope = _scope;
 });
 
 app.get('/fetch_resource', function(req: Request, res: Response) {
   /*
    * Use the access token to call the resource server
    */
+  if (access_token == null) {
+    res.render('error', {error: 'Missing access token'});
+    return;
+  }
+  const headers = {
+    'Authorization': `Bearer ${access_token}`,
+  };
+  const resourceResponse = request('POST', protectedResource, {
+    headers,
+  });
+  if (resourceResponse.statusCode >= 200 && resourceResponse.statusCode < 300) {
+    const resourceBody = JSON.parse(resourceResponse.getBody('utf-8') as string);
+    res.render('data', {resource: resourceBody});
+    return;
+  }
+  res.render('error', {error: 'Server returned response code ' + resourceResponse.statusCode});
 });
 
 interface UrlWithQuery extends url.UrlWithParsedQuery {
