@@ -2,6 +2,8 @@
 
 🪩🪩🪩 [oauth-in-action-code](https://github.com/osawa-koki/oauth-in-action-code)のChapter3のExercise1を試してみる！  
 
+![成果物](./fruit.gif)  
+
 ## 開発環境の構築
 
 DevContainerに入り、以下のコマンドを実行します。  
