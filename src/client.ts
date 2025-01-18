@@ -63,16 +63,20 @@ app.get('/fetch_resource', function(req: Request, res: Response) {
    */
 });
 
-const buildUrl = function(base: string, options: Record<string, any>, hash?: string) {
-  const newUrl = url.parse(base, true);
+interface UrlWithQuery extends url.UrlWithParsedQuery {
+  query: Record<string, string | string[]>;
+}
+
+const buildUrl = function(base: string, options: Record<string, string>, hash?: string) {
+  const newUrl = url.parse(base, true) as UrlWithQuery;
   delete newUrl.search;
-  if (!newUrl.query) {
+  if (newUrl.query == null) {
     newUrl.query = {};
   }
-  _.each(options, function(value: any, key: string) {
+  _.each(options, function(value: string, key: string) {
     newUrl.query[key] = value;
   });
-  if (hash) {
+  if (hash != null) {
     newUrl.hash = hash;
   }
 
@@ -86,8 +90,8 @@ const encodeClientCredentials = function(clientId: string, clientSecret: string)
 app.use('/', express.static('files/client'));
 
 const server = app.listen(9000, 'localhost', function () {
-  const adress = server.address() as { address: string; port: number };
-  const host = adress.address;
-  const port = adress.port;
+  const address = server.address() as { address: string; port: number };
+  const host = address.address;
+  const port = address.port;
   console.log('OAuth Client is listening at http://%s:%s', host, port);
 });
