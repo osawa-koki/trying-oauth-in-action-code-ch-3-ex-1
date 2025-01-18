@@ -17,8 +17,10 @@
     "build": "esbuild ./src/*.ts --bundle --outdir=./dist/ --minify --sourcemap --platform=node --target=es2020",
     "start:client": "node ./dist/client.js",
     "start:authorizationServer": "node ./dist/authorizationServer.js",
+    "start": "concurrently \"npm run start:client\" \"npm run start:authorizationServer\"",
     "dev:client": "node -r esbuild-register ./src/client.ts",
     "dev:authorizationServer": "node -r esbuild-register ./src/authorizationServer.ts",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:authorizationServer\"",
     "lint": "eslint ./src/**/*.ts",
     "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 0"
@@ -41,6 +43,7 @@
     "@types/express": "^5.0.0",
     "@types/randomstring": "^1.3.0",
     "@types/underscore": "^1.13.0",
+    "concurrently": "^9.1.2",
     "esbuild-register": "^3.6.0",
     "eslint": "^9.18.0",
     "globals": "^15.14.0",
