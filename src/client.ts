@@ -93,6 +93,22 @@ app.get('/fetch_resource', function(req: Request, res: Response) {
   /*
    * Use the access token to call the resource server
    */
+  if (access_token == null) {
+    res.render('error', {error: 'Missing access token'});
+    return;
+  }
+  const headers = {
+    'Authorization': `Bearer ${access_token}`,
+  };
+  const resourceResponse = request('POST', protectedResource, {
+    headers,
+  });
+  if (resourceResponse.statusCode >= 200 && resourceResponse.statusCode < 300) {
+    const resourceBody = JSON.parse(resourceResponse.getBody('utf-8') as string);
+    res.render('data', {resource: resourceBody});
+    return;
+  }
+  res.render('error', {error: 'Server returned response code ' + resourceResponse.statusCode});
 });
 
 interface UrlWithQuery extends url.UrlWithParsedQuery {
