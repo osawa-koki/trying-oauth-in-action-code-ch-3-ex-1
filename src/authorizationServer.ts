@@ -196,7 +196,7 @@ app.post("/token", function(req: Request, res: Response){
 					cscope = code.scope.join(' ')
 				}
 
-				db.insert({ access_token: access_token, client_id: clientId, scope: cscope });
+				db.insert({ access_token: access_token, client_id: clientId!, scope: cscope });
 
 				console.log('Issuing access token %s', access_token);
 				console.log('with scope %s', cscope);
