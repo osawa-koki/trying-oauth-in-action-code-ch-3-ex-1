@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import url from 'url';
 import bodyParser from 'body-parser';
 import randomstring from 'randomstring';
@@ -6,7 +6,6 @@ import cons from 'consolidate';
 import querystring from 'querystring';
 import _ from 'underscore';
 import * as _string from 'underscore.string';
-import { Request, Response } from 'express';
 import nosql from 'nosql';
 
 const db = nosql.load('database.nosql');
