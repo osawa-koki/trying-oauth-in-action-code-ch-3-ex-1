@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import request from 'sync-request';
 import url from 'url';
 import qs from 'qs';
 import querystring from 'querystring';
@@ -7,6 +6,7 @@ import cons from 'consolidate';
 import randomstring from 'randomstring';
 import _ from 'underscore';
 import * as _string from 'underscore.string';
+import axios from 'axios';
 
 Object.assign(_, { string: _string });
 
@@ -36,7 +36,6 @@ const client = {
 const protectedResource = 'http://localhost:9002/resource';
 
 let state: string | null = null;
-
 let access_token: string | null = null;
 let scope: string | null = null;
 
@@ -44,7 +43,7 @@ app.get('/', function (req: Request, res: Response) {
   res.render('index', {access_token: access_token, scope: scope});
 });
 
-app.get('/authorize', function(req: Request, res: Response){
+app.get('/authorize', function(req: Request, res: Response) {
   /*
    * Send the user to the authorization server
    */
@@ -58,7 +57,7 @@ app.get('/authorize', function(req: Request, res: Response){
   res.redirect(authorizeUrl);
 });
 
-app.get('/callback', function(req: Request, res: Response){
+app.get('/callback', async function(req: Request, res: Response) {
   /*
    * Parse the response from the authorization server and get a token
    */
@@ -77,19 +76,19 @@ app.get('/callback', function(req: Request, res: Response){
     'Content-Type': 'application/x-www-form-urlencoded',
     'Authorization': `Basic ${encodeClientCredentials(client.client_id, client.client_secret)}`,
   };
-  const tokenResponse = request('POST', authServer.tokenEndpoint, {
-    headers,
-    body: formData,
-  });
-  const responseBody = JSON.parse(tokenResponse.getBody('utf-8') as string);
-  const _accessToken = responseBody.access_token;
-  const _scope = responseBody.scope;
-  res.render('index', {access_token: _accessToken, scope: scope});
-  access_token = _accessToken;
-  scope = _scope;
+  try {
+    const tokenResponse = await axios.post(authServer.tokenEndpoint, formData, { headers });
+    const _accessToken = tokenResponse.data.access_token;
+    const _scope = tokenResponse.data.scope;
+    res.render('index', {access_token: _accessToken, scope: _scope});
+    access_token = _accessToken;
+    scope = _scope;
+  } catch (error) {
+    res.render('error', {error: 'Failed to get access token'});
+  }
 });
 
-app.get('/fetch_resource', function(req: Request, res: Response) {
+app.get('/fetch_resource', async function(req: Request, res: Response) {
   /*
    * Use the access token to call the resource server
    */
@@ -100,15 +99,16 @@ app.get('/fetch_resource', function(req: Request, res: Response) {
   const headers = {
     'Authorization': `Bearer ${access_token}`,
   };
-  const resourceResponse = request('POST', protectedResource, {
-    headers,
-  });
-  if (resourceResponse.statusCode >= 200 && resourceResponse.statusCode < 300) {
-    const resourceBody = JSON.parse(resourceResponse.getBody('utf-8') as string);
-    res.render('data', {resource: resourceBody});
-    return;
+  try {
+    const resourceResponse = await axios.post(protectedResource, null, { headers });
+    if (resourceResponse.status >= 200 && resourceResponse.status < 300) {
+      res.render('data', {resource: resourceResponse.data});
+      return;
+    }
+    res.render('error', {error: 'Server returned response code ' + resourceResponse.status});
+  } catch (error) {
+    res.render('error', {error: 'Failed to fetch resource'});
   }
-  res.render('error', {error: 'Server returned response code ' + resourceResponse.statusCode});
 });
 
 interface UrlWithQuery extends url.UrlWithParsedQuery {
