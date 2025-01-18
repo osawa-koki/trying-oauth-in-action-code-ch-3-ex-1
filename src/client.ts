@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import request from 'sync-request';
 import url from 'url';
 import qs from 'qs';
@@ -7,7 +7,6 @@ import cons from 'consolidate';
 import randomstring from 'randomstring';
 import _ from 'underscore';
 import * as _string from 'underscore.string';
-import { Request, Response } from 'express';
 
 Object.assign(_, { string: _string });
 
